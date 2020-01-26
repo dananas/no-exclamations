@@ -1,0 +1,66 @@
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+group 'com.github.dananas'
+version '0.1.0'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes("Lint-Registry-v2": "com.github.dananas.noexclamations.NoExclamations")
+    }
+}
+
+dependencies {
+    compileOnly "com.android.tools.lint:lint-gradle:26.5.3"
+    compileOnly "com.android.tools.lint:lint-api:26.5.3"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compileOnly "com.android.tools.build:gradle:3.5.3"
+}
+
+publishing {
+    publications {
+        PublishLint(MavenPublication) {
+            from components.java
+            groupId project.group
+            artifactId project.name
+            version project.version
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['PublishLint']
+    pkg {
+        repo = 'android'
+        name = project.name
+        userOrg = user
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/dananas/no-exclamations.git'
+        version {
+            name = project.version
+        }
+    }
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+sourceCompatibility = "8"
+targetCompatibility = "8"
